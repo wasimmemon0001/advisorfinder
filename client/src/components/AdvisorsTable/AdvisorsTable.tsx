@@ -20,10 +20,14 @@ export const AdvisorsTable: FC<AdvisorsTableProps> = ({ advisors, onLoadMore, fi
   const [orderBy, setOrderBy] = useState<keyof Data>('name')
   const [shouldShowOnline, setShouldShowOnline] = useState(false)
   const [searchValue, setSearchValue] = useState<string>('')
-
+  let timer: any = null
   const setSearch = (data: any) => {
-    setSearchValue(data)
-    filterDataAdvisors({ searchValue: data, shouldShowOnline })
+    console.log(searchValue)
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      console.log(searchValue)
+      filterDataAdvisors({ searchValue, shouldShowOnline })
+    }, 1000)
   }
 
   const filteredItems = useMemo(() => {
@@ -50,7 +54,12 @@ export const AdvisorsTable: FC<AdvisorsTableProps> = ({ advisors, onLoadMore, fi
       <Paper className={classes.paper}>
         <EnhancedTableToolbar />
         <div className={classes.searchWrapper}>
-          <TextField value={searchValue} label="Search..." onChange={e => setSearch(e.target.value)} />
+          <TextField
+            value={searchValue}
+            label="Search..."
+            onChange={(e: any) => setSearchValue(e.target.value)}
+            onKeyUp={(e: any) => setSearch(e.target.value)}
+          />
         </div>
         <TableContainer className={classes.tableContainer} onScroll={handleScroll}>
           <Table stickyHeader className={classes.table}>
