@@ -32,9 +32,10 @@ let dataInfo: any
 let fetchMoreData: any
 let loadmoreCalled = false
 let currentSearch: any = ''
-let totalCall = 0
+
 export const Advisors: FC = () => {
   const [offset, setOffset] = useState<number>(DEFAULT_OFFSET)
+  const [totalCall, settotalCall] = useState<number>(0)
   const [shouldFetchAgain, setShouldFetchAgain] = useState<boolean>(true)
   const classes = useLoadingStyles()
   const myref: any = useRef([])
@@ -114,7 +115,7 @@ export const Advisors: FC = () => {
           const advisors = fetchMoreResult?.data?.advisors
           if (advisors) {
             dataInfo.advisors = dataInfo.advisors.concat(advisors)
-            dataInfo.totalCall = totalCall++
+            settotalCall(totalCall + 1)
           }
           setOffset(currentLength + advisors.length)
         }
@@ -124,14 +125,11 @@ export const Advisors: FC = () => {
   }
   return (
     <Container>
-      {dataInfo && (
-        <AdvisorsTable
-          advisors={dataInfo.advisors || []}
-          onLoadMore={loadMoreHandler}
-          filterDataAdvisors={loadDataWithFilter}
-        />
-      )}
-      {!dataInfo && <div></div>}
+      <AdvisorsTable
+        advisors={dataInfo.advisors || []}
+        onLoadMore={loadMoreHandler}
+        filterDataAdvisors={loadDataWithFilter}
+      />
     </Container>
   )
 }

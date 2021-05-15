@@ -14,26 +14,31 @@ import { getComparator, filterAdvisors, arraySort } from './utils/advisorsTable'
 import { AdvisorsTableProps, Data, Order } from 'interfaces/advisors'
 import { useTableStyles } from './styles/advisorsTable'
 
+let lastadvisors: any
 export const AdvisorsTable: FC<AdvisorsTableProps> = ({ advisors, onLoadMore, filterDataAdvisors }) => {
   const classes = useTableStyles()
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof Data>('name')
   const [shouldShowOnline, setShouldShowOnline] = useState(false)
   const [searchValue, setSearchValue] = useState<string>('')
+  const [filteredItems, setFilteredItems] = useState<Data[]>([])
   let timer: any = null
   const setSearch = (data: any) => {
-    console.log(searchValue)
+    setSearchValue(data)
     clearTimeout(timer)
     timer = setTimeout(() => {
-      console.log(searchValue)
-      filterDataAdvisors({ searchValue, shouldShowOnline })
+      filterDataAdvisors({ searchValue: data, shouldShowOnline })
     }, 1000)
   }
 
-  const filteredItems = useMemo(() => {
-    const sortedAdvisors = arraySort(advisors, getComparator(order, orderBy))
-    return filterAdvisors({ searchValue, shouldShowOnline }, sortedAdvisors)
-  }, [advisors, searchValue, order, orderBy, shouldShowOnline])
+  if (lastadvisors != advisors) {
+    lastadvisors = advisors
+    setFilteredItems(advisors)
+  }
+  // const filteredItems = useMemo(() => {
+  //   const sortedAdvisors = arraySort(advisors, getComparator(order, orderBy))
+  //   return filterAdvisors({ searchValue, shouldShowOnline }, sortedAdvisors)
+  // }, [advisors, searchValue, order, orderBy, shouldShowOnline])
 
   const handleScroll = ({ currentTarget }: SyntheticEvent) => {
     if (currentTarget.scrollTop + currentTarget.clientHeight === currentTarget.scrollHeight) {
@@ -54,12 +59,7 @@ export const AdvisorsTable: FC<AdvisorsTableProps> = ({ advisors, onLoadMore, fi
       <Paper className={classes.paper}>
         <EnhancedTableToolbar />
         <div className={classes.searchWrapper}>
-          <TextField
-            value={searchValue}
-            label="Search..."
-            onChange={(e: any) => setSearchValue(e.target.value)}
-            onKeyUp={(e: any) => setSearch(e.target.value)}
-          />
+          <TextField value={searchValue} label="Search..." onChange={(e: any) => setSearch(e.target.value)} />
         </div>
         <TableContainer className={classes.tableContainer} onScroll={handleScroll}>
           <Table stickyHeader className={classes.table}>
