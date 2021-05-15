@@ -26,7 +26,7 @@ export const resolvers = {
       let filteradvisorsList = [];
       if (search || shouldShowOnline) {
         let i = 0;
-        while (filteradvisorsList.length < offset + limit && advisorsList[i]) {
+        while (advisorsList[i]) {
           for (let key in advisorsList[i]) {
             if (
               advisorsList[i][key] &&
