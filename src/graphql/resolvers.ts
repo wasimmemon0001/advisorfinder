@@ -19,15 +19,14 @@ export const resolvers = {
         limit,
         offset,
         search,
-      }: { limit: number; offset: number; search: string }
+        shouldShowOnline,
+      }: { limit: number; offset: number; search: string, shouldShowOnline: boolean }
     ) => {
       const advisorsList: any = await returnAdvisorsList();
-      console.log("start..........." + search);
       let filteradvisorsList = [];
-      if (search) {
+      if (search || shouldShowOnline) {
         let i = 0;
         while (filteradvisorsList.length < offset + limit && advisorsList[i]) {
-          console.log(search + "..........." + i);
           for (let key in advisorsList[i]) {
             if (
               advisorsList[i][key] &&
@@ -36,8 +35,15 @@ export const resolvers = {
                 .toLowerCase()
                 .indexOf(search.toLowerCase()) > -1
             ) {
-              filteradvisorsList.push(advisorsList[i]);
-              break;
+              if(shouldShowOnline) {
+                if(advisorsList[i]['status'] == 'online') {
+                  filteradvisorsList.push(advisorsList[i]);
+                  break;
+                }
+              } else {
+                filteradvisorsList.push(advisorsList[i]);
+                break;
+              }
             }
           }
           i++;
@@ -45,7 +51,6 @@ export const resolvers = {
       } else {
         filteradvisorsList = advisorsList;
       }
-      console.log("end...........");
       return filteradvisorsList.slice(offset).slice(0, limit);
     },
   },

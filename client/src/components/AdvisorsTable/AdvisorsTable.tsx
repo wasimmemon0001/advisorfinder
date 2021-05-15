@@ -52,7 +52,10 @@ export const AdvisorsTable: FC<AdvisorsTableProps> = ({ advisors, onLoadMore, fi
     setOrderBy(property)
   }
 
-  const toggleShouldShowOnline = () => setShouldShowOnline(shouldShowOnline => !shouldShowOnline)
+  const toggleShouldShowOnline = () => {
+    setShouldShowOnline(shouldShowOnline => !shouldShowOnline)
+    filterDataAdvisors({ searchValue, shouldShowOnline: !shouldShowOnline })
+  }
 
   return (
     <div className={classes.root} id="table-wrapper">

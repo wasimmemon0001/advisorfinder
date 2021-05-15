@@ -10,8 +10,8 @@ import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css'
 import { useLoadingStyles } from 'components/AdvisorsTable/styles/advisorsTable'
 
 export const GET_ADVISORS_QUERY = gql`
-  query advisors($limit: Int, $offset: Int, $search: String) {
-    advisors(limit: $limit, offset: $offset, search: $search) {
+  query advisors($limit: Int, $offset: Int, $search: String, $shouldShowOnline: Boolean) {
+    advisors(limit: $limit, offset: $offset, search: $search, shouldShowOnline: $shouldShowOnline) {
       id
       name
       language
@@ -32,6 +32,7 @@ let dataInfo: any
 let fetchMoreData: any
 let loadmoreCalled = false
 let currentSearch: any = ''
+let shouldShowOnline = false
 
 export const Advisors: FC = () => {
   const [offset, setOffset] = useState<number>(DEFAULT_OFFSET)
@@ -70,7 +71,6 @@ export const Advisors: FC = () => {
     )
 
   const loadMoreHandler = () => {
-    if (!shouldFetchAgain) return
     if (loadmoreCalled) return
     const currentLength = dataInfo.advisors.length
     loadmoreCalled = true
@@ -79,6 +79,7 @@ export const Advisors: FC = () => {
         offset,
         limit: DEFAULT_LIMIT,
         search: currentSearch,
+        shouldShowOnline: shouldShowOnline,
       },
     })
       // eslint-disable-next-line
@@ -96,21 +97,23 @@ export const Advisors: FC = () => {
   }
 
   const loadDataWithFilter = (data: any) => {
-    if (data.searchValue !== currentSearch) {
+    if (data.searchValue !== currentSearch || shouldShowOnline !== data.shouldShowOnline) {
       setOffset(DEFAULT_OFFSET)
     }
     const currentLength = dataInfo.advisors.length
     fetchMoreData({
       variables: {
-        offset,
+        offset: 0,
         limit: DEFAULT_LIMIT,
         search: data.searchValue,
+        shouldShowOnline: data.shouldShowOnline,
       },
     })
       // eslint-disable-next-line
       .then((fetchMoreResult: ApolloQueryResult<any>) => {
-        if (data.searchValue !== currentSearch) {
+        if (data.searchValue !== currentSearch || shouldShowOnline !== data.shouldShowOnline) {
           currentSearch = data.searchValue
+          shouldShowOnline = data.shouldShowOnline
           dataInfo.advisors = []
           const advisors = fetchMoreResult?.data?.advisors
           if (advisors) {

@@ -13,7 +13,7 @@ const typeDefs = gql`
     status: String!
   }
   type Query {
-    advisors(offset: Int, limit: Int, search: String): [Advisor!]!
+    advisors(offset: Int, limit: Int, search: String, shouldShowOnline: Boolean): [Advisor!]!
   }
 `;
 
